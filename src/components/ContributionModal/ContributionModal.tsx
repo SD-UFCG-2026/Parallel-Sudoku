@@ -115,7 +115,7 @@ function ContributionModal({
     }
 
     const content = [
-      "Sudoku Shared Computing",
+      "Sudoku Parallel Computing",
       "",
       `Nick: ${nickname.trim()}`,
       "",

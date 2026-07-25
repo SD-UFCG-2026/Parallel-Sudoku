@@ -151,7 +151,7 @@ function RunPage() {
     <main className="run-page">
       <header className="run-header">
         <h1>
-          Sudoku Shared Computing
+          Sudoku Parallel Computing
         </h1>
 
         <p>
@@ -177,7 +177,7 @@ function RunPage() {
 
             <div>
               <span className="legend-dot system" />
-              Sistema / nó inicial
+              Sudoku inicial
             </div>
 
             <div>
@@ -194,7 +194,7 @@ function RunPage() {
 
         <section className="run-panel">
           <h2>
-            Tabuleiro selecionado
+            Sudoku selecionado
           </h2>
 
           <div className="board-area">
@@ -259,10 +259,10 @@ function RunPage() {
             <h3>Como funciona</h3>
 
             <p>
-              Os números em azul foram adicionados pela
-              contribuição selecionada. Os números em verde
-              representam as alterações que você está fazendo
-              agora.
+              Ao adicionar números ao Sudoku, você está contribuindo para a solução do quebra-cabeça. 
+              Cada contribuição é registrada na árvore de contribuições, permitindo que outros usuários vejam e construam sobre o seu trabalho. 
+              Certifique-se de revisar suas alterações antes de enviar sua contribuição. Sua adição só será efetivada se correta e não conflitar com as contribuições anteriores.
+              OBS: Pode demorar alguns minutos para que sua contribuição seja processada e refletida na árvore de contribuições.
             </p>
           </div>
         </section>
