@@ -1,0 +1,194 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.contribution-modal {
+  width: min(520px, 100%);
+
+  padding: 24px;
+
+  border: 1px solid #374151;
+  border-radius: 14px;
+
+  background: #111827;
+  color: #e5e7eb;
+
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.modal-header h2 {
+  margin: 0;
+
+  color: #f9fafb;
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #9ca3af;
+
+  font-size: 1.6rem;
+
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.modal-description {
+  color: #9ca3af;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 24px;
+}
+
+.modal-field span {
+  font-weight: 600;
+}
+
+.modal-field input {
+  padding: 11px 12px;
+
+  border: 1px solid #374151;
+  border-radius: 7px;
+
+  background: #0d1117;
+  color: #f9fafb;
+
+  outline: none;
+}
+
+.modal-field input:focus {
+  border-color: #3b82f6;
+}
+
+.key-section {
+  margin-top: 24px;
+
+  padding: 16px;
+
+  border: 1px solid #374151;
+  border-radius: 8px;
+
+  background: #0d1117;
+}
+
+.key-label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-weight: 600;
+}
+
+.key-value {
+  padding: 10px;
+
+  border-radius: 6px;
+
+  background: #161b22;
+  color: #93c5fd;
+
+  font-family: monospace;
+
+  overflow-wrap: anywhere;
+}
+
+.key-warning {
+  margin-bottom: 0;
+
+  color: #9ca3af;
+
+  font-size: 0.85rem;
+}
+
+.key-actions,
+.modal-actions {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 16px;
+}
+
+.modal-actions {
+  justify-content: flex-end;
+
+  margin-top: 24px;
+}
+
+.secondary-button,
+.cancel-button,
+.confirm-button {
+  padding: 10px 16px;
+
+  border-radius: 7px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.secondary-button,
+.cancel-button {
+  border: 1px solid #4b5563;
+
+  background: transparent;
+  color: #d1d5db;
+}
+
+.secondary-button:hover,
+.cancel-button:hover {
+  background: #1f2937;
+}
+
+.confirm-button {
+  border: none;
+
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.confirm-button:disabled {
+  background: #374151;
+  color: #6b7280;
+
+  cursor: not-allowed;
+}

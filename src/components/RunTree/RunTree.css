@@ -1,0 +1,186 @@
+.run-tree {
+  width: 100%;
+  overflow-x: auto;
+  padding: 24px 16px;
+}
+
+.run-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.run-tree-root {
+  display: flex;
+  justify-content: center;
+}
+
+.run-tree-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.run-tree-node-wrapper {
+  position: relative;
+  z-index: 2;
+}
+
+.run-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 210px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #374151;
+  border-radius: 10px;
+
+  background: #161b22;
+  color: #f3f4f6;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.run-tree-node:hover {
+  border-color: #4b5563;
+  background: #1c232d;
+}
+
+.run-tree-node.selected {
+  border-color: #3b82f6;
+  background: #172033;
+
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.35);
+}
+
+.run-tree-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #374151;
+  color: #ffffff;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.run-tree-node.selected .run-tree-avatar {
+  background: #2563eb;
+}
+
+.run-tree-node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.run-tree-node-content strong {
+  color: #f9fafb;
+  font-size: 0.95rem;
+}
+
+.run-tree-node-subtitle {
+  color: #9ca3af;
+  font-size: 0.82rem;
+}
+
+.run-tree-node.system .run-tree-avatar {
+  background: #6b7280;
+}
+
+.run-tree-node.selected
+  .run-tree-node-subtitle {
+  color: #93c5fd;
+}
+
+.run-tree-children {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  gap: 32px;
+
+  padding-top: 42px !important;
+}
+
+.run-tree-children::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+
+  width: 1px;
+  height: 20px;
+
+  background: #4b5563;
+}
+
+.run-tree-children > .run-tree-item::before {
+  content: "";
+
+  position: absolute;
+
+  top: -22px;
+  left: 50%;
+
+  width: 1px;
+  height: 22px;
+
+  background: #4b5563;
+}
+
+.run-tree-children > .run-tree-item::after {
+  content: "";
+
+  position: absolute;
+
+  top: -22px;
+
+  height: 1px;
+
+  background: #4b5563;
+}
+
+.run-tree-children
+  > .run-tree-item:not(:only-child):first-child::after {
+  left: 50%;
+  width: calc(50% + 16px);
+}
+
+.run-tree-children
+  > .run-tree-item:not(:only-child):last-child::after {
+  right: 50%;
+  width: calc(50% + 16px);
+}
+
+.run-tree-children
+  > .run-tree-item:not(:first-child):not(:last-child)::after {
+  left: -16px;
+  right: -16px;
+}
+
+.run-tree-children
+  > .run-tree-item:only-child::after {
+  display: none;
+}
