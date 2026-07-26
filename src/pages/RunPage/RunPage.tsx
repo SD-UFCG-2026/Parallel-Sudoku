@@ -89,6 +89,12 @@ function RunPage() {
   const [editableBoard, setEditableBoard] =
     useState<number[][]>([]);
 
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
   const [modalOpen, setModalOpen] = useState(false);
 
   const selectedSudoku =
@@ -264,7 +270,45 @@ function RunPage() {
           parentNode,
         )
       : 0;
+    
+    if (loading) {
+      return (
+        <main className="run-page">
+          <div className="run-status">
+            <h2>Carregando Sudokus...</h2>
+            <p>
+              Buscando as árvores de contribuições.
+            </p>
+          </div>
+        </main>
+      );
+    }
 
+    if (error) {
+      return (
+        <main className="run-page">
+          <div className="run-status run-status-error">
+            <h2>Erro ao carregar Sudokus</h2>
+            <p>{error}</p>
+          </div>
+        </main>
+      );
+    }
+
+    if (sudokus.length === 0) {
+      return (
+        <main className="run-page">
+          <div className="run-status">
+            <h2>Nenhum Sudoku disponível</h2>
+            <p>
+              Não existem Sudokus disponíveis para
+              contribuição no momento.
+            </p>
+          </div>
+        </main>
+      );
+    }
+    
     return (
       <main className="run-page">
         <header className="run-header">
