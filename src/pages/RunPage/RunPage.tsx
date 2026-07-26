@@ -123,11 +123,6 @@ function RunPage() {
             data[0].root,
           );
 
-          setEditableBoard(
-            structuredClone(
-              data[0].root.value.board,
-            ),
-          );
         }
       } catch (error) {
         console.error(error);
