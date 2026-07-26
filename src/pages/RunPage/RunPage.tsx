@@ -89,13 +89,6 @@ function RunPage() {
   const [editableBoard, setEditableBoard] =
     useState<number[][]>([]);
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState<string | null>(null);
-
-
   const [modalOpen, setModalOpen] = useState(false);
 
   const selectedSudoku =
