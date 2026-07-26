@@ -308,3 +308,27 @@
   color: #4b5563;
   cursor: not-allowed;
 }
+.run-status {
+  min-height: 60vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.run-status h2 {
+  margin-bottom: 8px;
+
+  color: #f9fafb;
+}
+
+.run-status p {
+  color: #9ca3af;
+}
+
+.run-status-error h2 {
+  color: #ef4444;
+}
