@@ -332,3 +332,24 @@
 .run-status-error h2 {
   color: #ef4444;
 }
+.contribution-info > div:last-child {
+  min-width: 0;
+  flex: 1;
+}
+
+.contribution-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.contribution-name span {
+  min-width: 0;
+  flex: 1;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -78,7 +78,10 @@ function countAdditions(
 
 function RunPage() {
   const [sudokus, setSudokus] =
-  useState<RunDto[]>([]);
+    useState<RunDto[]>([]);
+
+  const [selectedSudoku, setSelectedSudoku] =
+    useState<RunDto | null>(null);
 
   const [selectedSudokuIndex, setSelectedSudokuIndex] =
     useState(0);
@@ -92,20 +95,19 @@ function RunPage() {
   const [loading, setLoading] =
     useState(true);
 
+  const [loadingTree, setLoadingTree] =
+    useState(false);
+
   const [error, setError] =
     useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const selectedSudoku =
+  const selectedSudokuSummary =
     sudokus[selectedSudokuIndex] ?? null;
 
-  // A API garante:
-  // index 0 -> id 1
-  // index 1 -> id 2
-  // ...
   const selectedSudokuId =
-    selectedSudokuIndex + 1;
+    selectedSudokuSummary?.id ?? null;
 
   useEffect(() => {
     async function loadSudokus() {
@@ -118,12 +120,22 @@ function RunPage() {
 
         setSudokus(data);
 
-        if (data.length > 0) {
-          setSelectedNode(
-            data[0].root,
+        if (data.length === 0) {
+          return;
+        }
+
+        const firstSudoku =
+          await getSudokuById(
+            data[0].id,
           );
 
-        }
+        setSelectedSudoku(
+          firstSudoku,
+        );
+
+        setSelectedNode(
+          firstSudoku.root,
+        );
       } catch (error) {
         console.error(error);
 
@@ -150,15 +162,47 @@ function RunPage() {
     );
   }, [selectedNode]);
 
-  function selectSudoku(index: number) {
-    const sudoku = sudokus[index];
+  async function selectSudoku(
+    index: number,
+  ) {
+    const sudokuSummary =
+      sudokus[index];
 
-    if (!sudoku) {
+    if (!sudokuSummary) {
       return;
     }
 
-    setSelectedSudokuIndex(index);
-    setSelectedNode(sudoku.root);
+    try {
+      setLoadingTree(true);
+
+      const sudoku =
+        await getSudokuById(
+          sudokuSummary.id,
+        );
+
+      setSelectedSudokuIndex(
+        index,
+      );
+
+      setSelectedSudoku(
+        sudoku,
+      );
+
+      setSelectedNode(
+        sudoku.root,
+      );
+    } catch (error) {
+      console.error(
+        "Erro ao carregar Sudoku:",
+        error,
+      );
+
+      setError(
+        "Não foi possível carregar a árvore do Sudoku.",
+      );
+    } finally {
+      setLoadingTree(false);
+    }
   }
 
   function previousSudoku() {
@@ -173,48 +217,62 @@ function RunPage() {
     );
   }
 
-    function handleBoardChange(
-      rowIndex: number,
-      columnIndex: number,
-      value: number,
-    ) {
-      setEditableBoard((current) => {
-        const updated =
-          structuredClone(current);
+  function handleBoardChange(
+    rowIndex: number,
+    columnIndex: number,
+    value: number,
+  ) {
+    setEditableBoard((current) => {
+      const updated =
+        structuredClone(current);
 
-        updated[rowIndex][columnIndex] =
-          value;
+      updated[rowIndex][columnIndex] =
+        value;
 
-        return updated;
-      });
-    }
+      return updated;
+    });
+  }
 
-    function hasChanges(
+  function hasChanges(
       original: number[][],
       edited: number[][],
     ): boolean {
+      if (
+        original.length === 0 ||
+        edited.length === 0 ||
+        original.length !== edited.length
+      ) {
+        return false;
+      }
+
       return original.some(
-        (row, rowIndex) =>
-          row.some(
+        (row, rowIndex) => {
+          const editedRow = edited[rowIndex];
+
+          if (!editedRow || row.length !== editedRow.length) {
+            return false;
+          }
+
+          return row.some(
             (value, columnIndex) =>
-              value !==
-              edited[rowIndex][columnIndex],
-          ),
+              value !== editedRow[columnIndex],
+          );
+        },
       );
     }
   
   async function refreshSelectedSudoku() {
+    if (!selectedSudoku) {
+      return;
+    }
+
     const updated =
       await getSudokuById(
-        selectedSudokuId,
+        selectedSudoku.id,
       );
 
-    setSudokus((current) =>
-      current.map((sudoku, index) =>
-        index === selectedSudokuIndex
-          ? updated
-          : sudoku,
-      ),
+    setSelectedSudoku(
+      updated,
     );
 
     setSelectedNode(
@@ -223,31 +281,36 @@ function RunPage() {
   }
 
   async function handleConfirmContribution(
-      signature: Signature,
+    signature: Signature,
+  ) {
+    if (
+      !selectedSudoku ||
+      !selectedNode
     ) {
-      if (!selectedSudoku || !selectedNode) {
-        throw new Error(
-          "Nenhum Sudoku selecionado.",
-        );
-      }
-
-      await submitContribution(
-        selectedSudokuId,
-        {
-          board: editableBoard,
-          signature,
-        },
+      throw new Error(
+        "Nenhum Sudoku selecionado.",
       );
-
-      await refreshSelectedSudoku();
     }
-    const boardHasChanges = 
-      selectedNode
+
+    await submitContribution(
+      selectedSudoku.id,
+      {
+        board: editableBoard,
+        signature,
+      },
+    );
+
+    await refreshSelectedSudoku();
+  }
+
+    const boardHasChanges =
+      selectedNode &&
+      editableBoard.length > 0
         ? hasChanges(
-          selectedNode.value.board,
-          editableBoard,
-        )
-      : false
+            selectedNode.value.board,
+            editableBoard,
+          )
+        : false;
 
     const parentNode =
     selectedSudoku &&
@@ -335,7 +398,7 @@ function RunPage() {
 
             <div>
               <strong>
-                Sudoku #{selectedSudokuId}
+                Sudoku #{selectedSudokuId ?? "-"}
               </strong>
 
               <span>
@@ -356,11 +419,24 @@ function RunPage() {
               →
             </button>
           </div>
-            {selectedSudoku && selectedNode && (
+            {loadingTree && (
+              <div className="tree-loading">
+                Carregando árvore...
+              </div>
+            )}
+            {selectedSudoku &&
+            selectedNode &&
+            !loadingTree && (
               <RunTree
-                root={selectedSudoku.root}
-                selectedNode={selectedNode}
-                onSelectNode={setSelectedNode}
+                root={
+                  selectedSudoku.root
+                }
+                selectedNode={
+                  selectedNode
+                }
+                onSelectNode={
+                  setSelectedNode
+                }
               />
             )}
 
@@ -428,10 +504,14 @@ function RunPage() {
               </div>
 
               <div>
-                <strong>
-                  Contribuição:{" "}
+              <strong className="contribution-name">
+                Contribuição:{" "}
+                <span
+                  title={selectedNode?.value.signature.identifier}
+                >
                   {selectedNode?.value.signature.identifier}
-                </strong>
+                </span>
+              </strong>
 
                 <p>
                   Adições em relação ao pai:{" "}

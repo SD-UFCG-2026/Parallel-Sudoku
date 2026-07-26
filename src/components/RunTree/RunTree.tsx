@@ -83,7 +83,9 @@ function TreeNode({
           </span>
 
           <span className="run-tree-node-content">
-            <strong>
+            <strong  title={isRoot
+                  ? "Sistema (Inicial)"
+                  : node.value.signature.identifier}>
               {isRoot
                 ? "Sistema (Inicial)"
                 : node.value.signature.identifier}
