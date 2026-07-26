@@ -1,6 +1,7 @@
 import type { RunDto } from "../types/run";
 
 export const runMock: RunDto = {
+  id:1,
   root: {
     value: {
       board: [
