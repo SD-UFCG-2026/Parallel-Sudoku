@@ -545,6 +545,7 @@ function RunPage() {
             onClose={() =>
               setModalOpen(false)
             }
+            board={editableBoard}
             onConfirm={
               handleConfirmContribution
             }

@@ -4,11 +4,20 @@ import {
 } from "react";
 
 import type { Signature } from "../../types/signature";
-import {generateEllipticKeyPair} from "../../utils/ellipticKey";
+
+import {
+  signContribution,
+} from "../../utils/ellipticKey";
+
+import {
+  encodeSignaturePayload,
+} from "../../utils/signaturePayload";
+
 import "./ContributionModal.css";
 
 interface ContributionModalProps {
   open: boolean;
+  board: number[][];
   onClose: () => void;
 
   onConfirm: (
@@ -23,6 +32,7 @@ type ModalStep =
 
 function ContributionModal({
   open,
+  board,
   onClose,
   onConfirm,
 }: ContributionModalProps) {
@@ -68,22 +78,31 @@ function ContributionModal({
     try {
       setStep("sending");
 
-      const keyPair =
-        await generateEllipticKeyPair();
+      const signedContribution =
+        await signContribution(
+          trimmedNickname,
+          board,
+        );
+
+      const encodedKey =
+        encodeSignaturePayload(
+          signedContribution.publicKey,
+          signedContribution.signature,
+        );
 
       const signature: Signature = {
         identifier: trimmedNickname,
-        key: keyPair.publicKey,
+        key: encodedKey,
       };
 
       await onConfirm(signature);
 
-      setPublicKey(
-        keyPair.publicKey,
+      setPrivateKey(
+        signedContribution.privateKey,
       );
 
-      setPrivateKey(
-        keyPair.privateKey,
+      setPublicKey(
+        signedContribution.publicKey,
       );
 
       setStep("success");
