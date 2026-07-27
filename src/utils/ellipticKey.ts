@@ -1,3 +1,49 @@
+export interface EllipticKeyPair {
+  publicKey: string;
+  privateKey: string;
+}
+
+export interface SignedContribution
+  extends EllipticKeyPair {
+  signature: string;
+}
+
+export async function generateEllipticKeyPair(): Promise<EllipticKeyPair> {
+  const keyPair =
+    await crypto.subtle.generateKey(
+      {
+        name: "ECDSA",
+        namedCurve: "P-256",
+      },
+      true,
+      ["sign", "verify"],
+    );
+
+  const publicKeyBuffer =
+    await crypto.subtle.exportKey(
+      "spki",
+      keyPair.publicKey,
+    );
+
+  const privateKeyBuffer =
+    await crypto.subtle.exportKey(
+      "pkcs8",
+      keyPair.privateKey,
+    );
+
+  return {
+    publicKey:
+      arrayBufferToBase64(
+        publicKeyBuffer,
+      ),
+
+    privateKey:
+      arrayBufferToBase64(
+        privateKeyBuffer,
+      ),
+  };
+}
+
 export interface SignedContribution {
   publicKey: string;
   privateKey: string;

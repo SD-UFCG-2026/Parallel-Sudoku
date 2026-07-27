@@ -353,3 +353,43 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.contribution-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.contribution-actions
+  .submit-contribution-button {
+  margin: 0;
+}
+
+.docker-contribution-button {
+  padding: 12px 24px;
+
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+
+  background: #161b22;
+  color: #f3f4f6;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.docker-contribution-button:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #172033;
+}
+
+.docker-contribution-button:disabled {
+  color: #6b7280;
+
+  cursor: not-allowed;
+}

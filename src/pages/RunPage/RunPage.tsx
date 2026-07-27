@@ -6,7 +6,7 @@ import {
 import RunTree from "../../components/RunTree/RunTree";
 import SudokuBoard from "../../components/SudokuBoard/SudokuBoard";
 import ContributionModal from "../../components/ContributionModal/ContributionModal";
-
+import DockerContributionModal from "../../components/DockerContributionModal/DockerContributionModal";
 import type { Signature } from "../../types/signature";
 import type { NodeDto } from "../../types/node";
 import type { RunDto } from "../../types/run";
@@ -102,6 +102,7 @@ function RunPage() {
     useState<string | null>(null);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [dockerModalOpen, setDockerModalOpen] = useState(false);
 
   const selectedSudokuSummary =
     sudokus[selectedSudokuIndex] ?? null;
@@ -520,15 +521,29 @@ function RunPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="submit-contribution-button"
-              disabled={!boardHasChanges}
-              onClick={() => setModalOpen(true)}
-            >
-              Enviar contribuição
-            </button>
+            <div className="contribution-actions">
+              <button
+                type="button"
+                className="submit-contribution-button"
+                disabled={!boardHasChanges}
+                onClick={() =>
+                  setModalOpen(true)
+                }
+              >
+                Enviar contribuição
+              </button>
 
+              <button
+                type="button"
+                className="docker-contribution-button"
+                disabled={!selectedSudoku}
+                onClick={() =>
+                  setDockerModalOpen(true)
+                }
+              >
+                Contribuir com Docker
+              </button>
+            </div>
             <div className="board-help">
               <h3>Como funciona</h3>
 
@@ -550,6 +565,15 @@ function RunPage() {
               handleConfirmContribution
             }
           />
+          {selectedSudoku && (
+            <DockerContributionModal
+              open={dockerModalOpen}
+              sudokuId={selectedSudoku.id}
+              onClose={() =>
+                setDockerModalOpen(false)
+              }
+            />
+          )}
         </div>
       </main>
     );
