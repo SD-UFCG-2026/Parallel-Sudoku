@@ -85,11 +85,12 @@ function DockerContributionModal({
       }
 
       return [
-        `docker run ${DOCKER_IMAGE}`,
+        `docker run`,
         `-e PRIVATE_KEY="${privateKey}"`,
         `-e PUBLIC_KEY="${publicKey}"`,
         `-e IDENTIFIER="${nickname.trim()}"`,
         `-e URL="${API_URL}/${sudokuId}"`,
+        `${DOCKER_IMAGE}`
       ].join(" ");
     }, [
       nickname,
