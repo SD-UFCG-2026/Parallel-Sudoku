@@ -122,7 +122,7 @@ function ApiExampleModal({
       url: `${API_URL}/${sudokuId}`,
       description:
         "Envia um novo estado de tabuleiro para o Sudoku selecionado.",
-      body: JSON.stringify(
+      body: JSON.stringify({
         [
           [1, 0, 0, 4],
           [0, 0, 0, 0],
@@ -133,8 +133,9 @@ function ApiExampleModal({
           identifier: "Jogador1",
           key: "ExemploKey",
         },
+        null,
         2,
-      ),
+      }),
     },
   };
 
