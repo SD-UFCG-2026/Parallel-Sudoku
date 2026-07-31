@@ -117,28 +117,29 @@ function ApiExampleModal({
       ),
     },
 
-    post: {
-      method: "POST",
-      url: `${API_URL}/${sudokuId}`,
-      description:
-        "Envia um novo estado de tabuleiro para o Sudoku selecionado.",
-      body: JSON.stringify({
-        [
-          [1, 0, 0, 4],
-          [0, 0, 0, 0],
-          [2, 0, 0, 3],
-          [4, 0, 1, 2],
-        ],
-        signature:{
-          identifier: "Jogador1",
-          key: "ExemploKey",
-        },
-        null,
-        2,
-      }),
+post: {
+  method: "POST",
+  url: `${API_URL}/${sudokuId}`,
+  description:
+    "Envia um novo estado do tabuleiro para o Sudoku selecionado.",
+  body: JSON.stringify(
+    {
+      board: [
+        [1, 0, 0, 4],
+        [0, 0, 0, 0],
+        [2, 0, 0, 3],
+        [4, 0, 1, 2],
+      ],
+      signature: {
+        identifier: "Jogador1",
+        key: "ExemploKey",
+      },
     },
+    null,
+    2,
+  ),
+},
   };
-
   const example =
     examples[selectedTab];
 
