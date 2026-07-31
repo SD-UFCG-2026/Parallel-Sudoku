@@ -9,7 +9,7 @@ import {
 } from "../../utils/ellipticKey";
 
 import "./DockerContributionModal.css";
-
+import ApiExampleModal from "../ApiExampleModal/ApiExampleModal";
 interface DockerContributionModalProps {
   open: boolean;
   sudokuId: number;
@@ -40,6 +40,9 @@ function DockerContributionModal({
     useState(false);
 
   const [copied, setCopied] =
+    useState(false);
+
+  const [apiExampleOpen, setApiExampleOpen] =
     useState(false);
 
   useEffect(() => {
@@ -203,9 +206,30 @@ function DockerContributionModal({
                 diretamente a este Sudoku.
               </p>
             </div>
+            
+            <div className="docker-info">
+              <strong>
+                Implemente seu próprio worker
+              </strong>
+              <p>
+                Por meio da API, você pode desenvolver um worker próprio e utilizar o algoritmo de resolução de Sudoku que preferir. O worker pode consultar os Sudokus disponíveis, obter a árvore completa de estados, calcular uma nova solução parcial ou completa e enviar o novo tabuleiro para a aplicação.
+              </p>
+              <p>
+                Essa abordagem permite experimentar diferentes estratégias, como força bruta, backtracking, heurísticas, algoritmos probabilísticos ou técnicas de inteligência artificial. O worker pode ser executado localmente, em um contêiner Docker ou em outro ambiente com acesso à API.
+              </p>
+            </div>
           </>
         )}
-
+        
+        <button
+          type="button"
+          className="api-example-button"
+          onClick={() =>
+            setApiExampleOpen(true)
+          }
+        >
+          Ver exemplo da API
+        </button>
         <div className="modal-actions">
           <button
             type="button"
@@ -216,7 +240,15 @@ function DockerContributionModal({
           </button>
         </div>
       </div>
+      <ApiExampleModal
+        open={apiExampleOpen}
+        sudokuId={sudokuId}
+        onClose={() =>
+          setApiExampleOpen(false)
+        }
+      />
     </div>
+    
   );
 }
 
