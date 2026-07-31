@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -100,6 +101,53 @@ function RunPage() {
 
   const [error, setError] =
     useState<string | null>(null);
+  //Movimentação Tabuleiro
+  const boardViewportRef =
+  useRef<HTMLDivElement | null>(null);
+
+  const boardContentRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const [boardZoom, setBoardZoom] =
+    useState(1);
+
+  const [boardPosition, setBoardPosition] =
+    useState({
+      x: 0,
+      y: 0,
+    });
+
+  const [isDraggingBoard, setIsDraggingBoard] =
+    useState(false);
+
+  const dragStartRef = useRef({
+    mouseX: 0,
+    mouseY: 0,
+    boardX: 0,
+    boardY: 0,
+  });
+  //Movimentação Árvore
+  const treeViewportRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const [treeZoom, setTreeZoom] =
+    useState(1);
+
+  const [treePosition, setTreePosition] =
+    useState({
+      x: 24,
+      y: 24,
+    });
+
+  const [isDraggingTree, setIsDraggingTree] =
+    useState(false);
+
+  const treeDragStartRef = useRef({
+    pointerX: 0,
+    pointerY: 0,
+    treeX: 0,
+    treeY: 0,
+  });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [dockerModalOpen, setDockerModalOpen] = useState(false);
@@ -163,6 +211,36 @@ function RunPage() {
     );
   }, [selectedNode]);
 
+  useEffect(() => {
+    const animationFrame =
+      requestAnimationFrame(() => {
+        fitBoardToViewport();
+      });
+
+    return () =>
+      cancelAnimationFrame(
+        animationFrame,
+      );
+  }, [selectedNode]);
+
+  useEffect(() => {
+    function handleResize() {
+      fitBoardToViewport();
+    }
+
+    window.addEventListener(
+      "resize",
+      handleResize,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        handleResize,
+      );
+    };
+  }, []);
+
   async function selectSudoku(
     index: number,
   ) {
@@ -205,7 +283,264 @@ function RunPage() {
       setLoadingTree(false);
     }
   }
+//Movimentação Árvore
+  function changeTreeZoom(
+    difference: number,
+  ) {
+    setTreeZoom((currentZoom) => {
+      const nextZoom = Math.min(
+        2,
+        Math.max(
+          0.25,
+          currentZoom + difference,
+        ),
+      );
 
+      return Number(
+        nextZoom.toFixed(2),
+      );
+    });
+  }
+
+  function resetTreeView() {
+    setTreeZoom(1);
+
+    setTreePosition({
+      x: 24,
+      y: 24,
+    });
+  }
+  function handleTreePointerDown(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (event.button !== 0) {
+      return;
+    }
+
+    const target =
+      event.target as HTMLElement;
+
+    /*
+    * Evita iniciar o arraste ao clicar
+    * diretamente em um nó da árvore.
+    */
+    if (
+      target.closest(
+        "button, input, textarea, select",
+      )
+    ) {
+      return;
+    }
+
+    setIsDraggingTree(true);
+
+    treeDragStartRef.current = {
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      treeX: treePosition.x,
+      treeY: treePosition.y,
+    };
+
+    event.currentTarget.setPointerCapture(
+      event.pointerId,
+    );
+  }
+
+  function handleTreePointerMove(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (!isDraggingTree) {
+      return;
+    }
+
+    const deltaX =
+      event.clientX -
+      treeDragStartRef.current.pointerX;
+
+    const deltaY =
+      event.clientY -
+      treeDragStartRef.current.pointerY;
+
+    setTreePosition({
+      x:
+        treeDragStartRef.current.treeX +
+        deltaX,
+
+      y:
+        treeDragStartRef.current.treeY +
+        deltaY,
+    });
+  }
+
+  function handleTreePointerUp(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    setIsDraggingTree(false);
+
+    if (
+      event.currentTarget.hasPointerCapture(
+        event.pointerId,
+      )
+    ) {
+      event.currentTarget.releasePointerCapture(
+        event.pointerId,
+      );
+    }
+  }
+
+
+//Movimentação Tabuleiro
+  function fitBoardToViewport() {
+    const viewport =
+      boardViewportRef.current;
+
+    const content =
+      boardContentRef.current;
+
+    if (!viewport || !content) {
+      return;
+    }
+
+    const viewportWidth =
+      viewport.clientWidth - 32;
+
+    const viewportHeight =
+      viewport.clientHeight - 32;
+
+    const boardWidth =
+      content.scrollWidth;
+
+    const boardHeight =
+      content.scrollHeight;
+
+    if (
+      boardWidth === 0 ||
+      boardHeight === 0
+    ) {
+      return;
+    }
+
+    const scaleX =
+      viewportWidth / boardWidth;
+
+    const scaleY =
+      viewportHeight / boardHeight;
+
+    const fittedZoom = Math.min(
+      scaleX,
+      scaleY,
+      1,
+    );
+
+    setBoardZoom(fittedZoom);
+
+    setBoardPosition({
+      x:
+        (viewport.clientWidth -
+          boardWidth * fittedZoom) /
+        2,
+
+      y:
+        (viewport.clientHeight -
+          boardHeight * fittedZoom) /
+        2,
+    });
+  }
+  function changeBoardZoom(
+    difference: number,
+  ) {
+    setBoardZoom((currentZoom) => {
+      const nextZoom = Math.min(
+        2,
+        Math.max(
+          0.2,
+          currentZoom + difference,
+        ),
+      );
+
+      return Number(
+        nextZoom.toFixed(2),
+      );
+    });
+  }
+
+  function resetBoardView() {
+    fitBoardToViewport();
+  }
+
+  function handleBoardPointerDown(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    const target =
+      event.target as HTMLElement;
+
+    if (
+      target.closest(
+        "input, button, textarea, select",
+      )
+    ) {
+      return;
+    }
+
+    if (event.button !== 0) {
+      return;
+    }
+
+    setIsDraggingBoard(true);
+
+    dragStartRef.current = {
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      boardX: boardPosition.x,
+      boardY: boardPosition.y,
+    };
+
+    event.currentTarget.setPointerCapture(
+      event.pointerId,
+    );
+  }
+
+  function handleBoardPointerMove(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (!isDraggingBoard) {
+      return;
+    }
+
+    const deltaX =
+      event.clientX -
+      dragStartRef.current.mouseX;
+
+    const deltaY =
+      event.clientY -
+      dragStartRef.current.mouseY;
+
+    setBoardPosition({
+      x:
+        dragStartRef.current.boardX +
+        deltaX,
+
+      y:
+        dragStartRef.current.boardY +
+        deltaY,
+    });
+  }
+
+  function handleBoardPointerUp(
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    setIsDraggingBoard(false);
+
+    if (
+      event.currentTarget.hasPointerCapture(
+        event.pointerId,
+      )
+    ) {
+      event.currentTarget.releasePointerCapture(
+        event.pointerId,
+      );
+    }
+  }
   function previousSudoku() {
     selectSudoku(
       selectedSudokuIndex - 1,
@@ -419,27 +754,86 @@ function RunPage() {
             >
               →
             </button>
+            </div>
+          <div className="tree-controls">
+            <button
+              type="button"
+              className="tree-control-button"
+              aria-label="Diminuir zoom da árvore"
+              onClick={() =>
+                changeTreeZoom(-0.1)
+              }
+            >
+              −
+            </button>
+
+            <span className="tree-zoom-value">
+              {Math.round(treeZoom * 100)}%
+            </span>
+
+            <button
+              type="button"
+              className="tree-control-button"
+              aria-label="Aumentar zoom da árvore"
+              onClick={() =>
+                changeTreeZoom(0.1)
+              }
+            >
+              +
+            </button>
+
+            <button
+              type="button"
+              className="tree-reset-button"
+              onClick={resetTreeView}
+            >
+              Redefinir
+            </button>
           </div>
-            {loadingTree && (
-              <div className="tree-loading">
-                Carregando árvore...
-              </div>
-            )}
-            {selectedSudoku &&
-            selectedNode &&
-            !loadingTree && (
-              <RunTree
-                root={
-                  selectedSudoku.root
-                }
-                selectedNode={
-                  selectedNode
-                }
-                onSelectNode={
-                  setSelectedNode
-                }
-              />
-            )}
+
+          <div
+            ref={treeViewportRef}
+            className={`tree-viewport ${
+              isDraggingTree
+                ? "tree-viewport-dragging"
+                : ""
+            }`}
+            onPointerDown={
+              handleTreePointerDown
+            }
+            onPointerMove={
+              handleTreePointerMove
+            }
+            onPointerUp={
+              handleTreePointerUp
+            }
+            onPointerCancel={
+              handleTreePointerUp
+            }
+          >
+            <div
+              className="tree-zoom-content"
+              style={{
+                transform: `
+                  translate(
+                    ${treePosition.x}px,
+                    ${treePosition.y}px
+                  )
+                  scale(${treeZoom})
+                `,
+              }}
+            >
+              {selectedSudoku &&
+                selectedNode &&
+                !loadingTree && (
+                  <RunTree
+                    root={selectedSudoku.root}
+                    selectedNode={selectedNode}
+                    onSelectNode={setSelectedNode}
+                  />
+                )}
+            </div>
+          </div>
 
             <div className="run-legend">
               <h3>Legenda</h3>
@@ -466,20 +860,102 @@ function RunPage() {
               Sudoku selecionado
             </h2>
 
-            <div className="board-area">
-              {selectedNode && (
-                <SudokuBoard
-                  board={selectedNode.value.board}
-                  parentBoard={
-                    parentNode?.value.board ?? null
+            <div className="board-section">
+              <div className="board-controls">
+                <button
+                  type="button"
+                  className="board-control-button"
+                  aria-label="Diminuir zoom"
+                  onClick={() =>
+                    changeBoardZoom(-0.1)
                   }
-                  editableBoard={editableBoard}
-                editable
-                onChange={handleBoardChange}
-                />
-              )}
+                >
+                  −
+                </button>
+
+                <span className="board-zoom-value">
+                  {Math.round(
+                    boardZoom * 100,
+                  )}
+                  %
+                </span>
+
+                <button
+                  type="button"
+                  className="board-control-button"
+                  aria-label="Aumentar zoom"
+                  onClick={() =>
+                    changeBoardZoom(0.1)
+                  }
+                >
+                  +
+                </button>
+
+                <button
+                  type="button"
+                  className="board-fit-button"
+                  onClick={resetBoardView}
+                >
+                  Ajustar
+                </button>
+              </div>
+
+              <div
+                ref={boardViewportRef}
+                className={`board-viewport ${
+                  isDraggingBoard
+                    ? "board-viewport-dragging"
+                    : ""
+                }`}
+                onPointerDown={
+                  handleBoardPointerDown
+                }
+                onPointerMove={
+                  handleBoardPointerMove
+                }
+                onPointerUp={
+                  handleBoardPointerUp
+                }
+                onPointerCancel={
+                  handleBoardPointerUp
+                }
+              >
+                <div
+                  ref={boardContentRef}
+                  className="board-zoom-content"
+                  style={{
+                    transform: `
+                      translate(
+                        ${boardPosition.x}px,
+                        ${boardPosition.y}px
+                      )
+                      scale(${boardZoom})
+                    `,
+                  }}
+                >
+                  {selectedNode && (
+                    <SudokuBoard
+                      board={
+                        selectedNode.value.board
+                      }
+                      parentBoard={
+                        parentNode?.value.board ??
+                        null
+                      }
+                      editableBoard={
+                        editableBoard
+                      }
+                      editable
+                      onChange={
+                        handleBoardChange
+                      }
+                    />
+                  )}
+                </div>
+              </div>
             </div>
 
+            
             <div className="board-legend">
               <div>
                 <span className="board-legend-color inherited" />

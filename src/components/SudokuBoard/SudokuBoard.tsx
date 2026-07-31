@@ -13,6 +13,22 @@ interface SudokuBoardProps {
   ) => void;
 }
 
+function getCellSize(boardSize: number): number {
+  if (boardSize <= 4) {
+    return 72;
+  }
+
+  if (boardSize <= 9) {
+    return 52;
+  }
+
+  if (boardSize <= 16) {
+    return 38;
+  }
+
+  return 30;
+}
+
 function SudokuBoard({
   board,
   parentBoard = null,
@@ -103,8 +119,17 @@ function SudokuBoard({
     );
   }
 
+  const boardSize = board.length;
+  const cellSize = getCellSize(boardSize);
+
   return (
-    <div className="sudoku-board">
+    <div className="sudoku-board"
+          style={{
+        "--sudoku-size": boardSize,
+        "--cell-size": `${cellSize}px`,
+      } as React.CSSProperties}
+    >
+
       {board.map(
         (row, rowIndex) => (
           <div
