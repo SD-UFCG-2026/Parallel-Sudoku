@@ -129,7 +129,10 @@ function ApiExampleModal({
           [2, 0, 0, 3],
           [4, 0, 1, 2],
         ],
-        null,
+        signature:{
+          identifier: "Jogador1",
+          key: "ExemploKey",
+        },
         2,
       ),
     },
